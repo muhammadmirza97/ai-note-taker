@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notes</title>
+    <link rel="stylesheet" href="/static/style.css?v=private-dark-2">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Notes</div>
+      <div class="topbar-actions">
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-link active" data-view="dashboard" type="button">Dashboard</button>
+          <button class="nav-link" data-view="capture" type="button">Add</button>
+        </nav>
+        <button id="open-outputs-button" class="secondary-button" type="button">Outputs Folder</button>
+        <button id="logout-button" class="secondary-button hidden" type="button">Log out</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section id="auth-view" class="view active">
+        <div class="auth-layout">
+          <section class="auth-panel">
+            <div class="page-heading compact-heading">
+              <div>
+                <h1 id="auth-title">Welcome back</h1>
+                <p>Sign in to keep your lecture notes private and synced to this device.</p>
+              </div>
+            </div>
+            <form id="auth-form" class="auth-form">
+              <label>
+                <span>Email</span>
+                <input id="auth-email" type="email" autocomplete="email" required>
+              </label>
+              <label>
+                <span>Password</span>
+                <input id="auth-password" type="password" autocomplete="current-password" minlength="8" required>
+              </label>
+              <div id="auth-message" class="inline-message" role="status"></div>
+              <button id="auth-submit-button" class="primary-button" type="submit">Sign in</button>
+            </form>
+            <div class="auth-switch">
+              <button id="auth-mode-button" class="text-button" type="button">Create your account</button>
+              <button id="password-reset-button" class="text-button" type="button">Reset password</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="view">
+        <div class="page-heading">
+          <div>
+            <h1>Your dashboard</h1>
+            <p>Add material and keep your study outputs organized.</p>
+          </div>
+          <button id="dashboard-record-button" class="primary-button" type="button">New note</button>
+        </div>
+
+        <div class="toolbar">
+          <input id="search-input" type="search" placeholder="Search lectures" autocomplete="off">
+          <select id="date-filter" aria-label="Filter by date">
+            <option value="all">Any date</option>
+            <option value="today">Today</option>
+            <option value="week">Last 7 days</option>
+            <option value="month">Last 30 days</option>
+          </select>
+        </div>
+
+        <section class="study-next-panel">
+          <div class="panel-heading">
+            <h2>What should I study next?</h2>
+            <p>Small, useful nudges based on your quizzes and flashcards.</p>
+          </div>
+          <div id="dashboard-insight" class="inline-message"></div>
+          <div id="recommendations-list" class="recommendations-list"></div>
+        </section>
+
+        <div id="sessions-list" class="sessions-list"></div>
+      </section>
+
+      <section id="capture-view" class="view">
+        <div class="page-heading">
+          <div>
+            <h1>Add material</h1>
+            <p>Start from live audio, a media file, or plain text.</p>
+          </div>
+        </div>
+
+        <div class="capture-grid">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <h2>Live capture</h2>
+              <p>Keep this tab open while capturing audio locally.</p>
+            </div>
+            <div class="record-stage">
+              <button id="record-button" class="record-button" type="button" aria-label="Start recording">
+                <span id="record-icon"></span>
+              </button>
+              <div class="timer-row">
+                <span id="recording-timer">0:00</span>
+                <span id="recording-state">Ready</span>
+              </div>
+              <div class="level-meter" aria-label="Microphone level">
+                <span id="level-bar"></span>
+              </div>
+            </div>
+            <div class="button-row">
+              <button id="pause-button" class="secondary-button" type="button" disabled>Pause</button>
+              <button id="stop-button" class="secondary-button danger" type="button" disabled>Stop</button>
+            </div>
+          </section>
+
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <h2>File input</h2>
+              <p>Audio, video, and plain text are ready now.</p>
+            </div>
+            <label id="upload-dropzone" class="upload-dropzone" for="file-input">
+              <span>Drop a file here</span>
+              <strong>Choose file</strong>
+            </label>
+            <input id="file-input" type="file" class="sr-only" accept="audio/*,video/*,.txt,.md,.markdown,.pdf,.ppt,.pptx,.png,.jpg,.jpeg">
+            <div id="upload-message" class="inline-message" role="status"></div>
+          </section>
+        </div>
+
+        <section id="processing-panel" class="processing-panel hidden">
+          <div class="panel-heading">
+            <h2>Processing</h2>
+            <p id="status-text">Ready</p>
+          </div>
+          <div class="steps" aria-label="Processing steps">
+            <div class="step" data-step="1">1. Uploading</div>
+            <div class="step" data-step="2">2. Transcribing</div>
+            <div class="step" data-step="3">3. Generating notes</div>
+          </div>
+          <div id="queue-list" class="queue-list"></div>
+        </section>
+
+        <div id="record-results" class="results-grid hidden">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <h2>Summary</h2>
+              <p>Your first study notes are ready.</p>
+            </div>
+            <div id="summary-output" class="text-output"></div>
+          </section>
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <h2>Transcript</h2>
+              <p>The full text captured from the lecture.</p>
+            </div>
+            <div id="transcript-output" class="text-output"></div>
+          </section>
+        </div>
+
+        <div class="action-row">
+          <button id="save-view-button" class="primary-button hidden" type="button">Open session</button>
+        </div>
+      </section>
+
+      <section id="detail-view" class="view">
+        <div class="detail-header">
+          <div>
+            <button id="back-history-button" class="text-button" type="button">Back to dashboard</button>
+            <h1 id="detail-title"></h1>
+            <p id="detail-date"></p>
+          </div>
+          <button id="overview-export-button" class="secondary-button" type="button">Export notes</button>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Lecture sections">
+          <button class="tab-button active" data-tab="overview" type="button">Overview</button>
+          <button class="tab-button" data-tab="transcript" type="button">Transcript</button>
+          <button class="tab-button" data-tab="summary" type="button">Summary</button>
+          <button class="tab-button" data-tab="key-points" type="button">Key Points</button>
+          <button class="tab-button" data-tab="mind-map" type="button">Mind Map</button>
+          <button class="tab-button" data-tab="ask" type="button">Ask</button>
+          <button class="tab-button" data-tab="flashcards" type="button">Flashcards</button>
+          <button class="tab-button" data-tab="quiz" type="button">Quiz</button>
+          <button class="tab-button" data-tab="scripts" type="button">Scripts</button>
+          <button class="tab-button" data-tab="export" type="button">Export</button>
+        </div>
+
+        <section id="tab-overview" class="tab-panel active">
+          <div class="tab-heading">
+            <h2>Overview</h2>
+            <p>Check the status and choose your next study step.</p>
+          </div>
+          <div class="overview-grid">
+            <div class="stat-card"><span>Date</span><strong id="overview-date"></strong></div>
+            <div class="stat-card"><span>Source</span><strong id="overview-source"></strong></div>
+            <div class="stat-card"><span>Duration</span><strong id="overview-duration"></strong></div>
+            <div class="stat-card"><span>Status</span><strong id="overview-status"></strong></div>
+          </div>
+          <div class="section-actions">
+            <button class="primary-button" data-tab-jump="summary" type="button">Study the summary</button>
+            <button class="secondary-button" data-export-format="markdown" type="button">Download Markdown</button>
+            <button class="secondary-button" data-export-format="pdf" type="button">Download PDF</button>
+          </div>
+          <div class="overview-panels">
+            <div class="mini-panel">
+              <h3>Topics to review</h3>
+              <div id="overview-weak-topics" class="topic-list"></div>
+            </div>
+            <div class="mini-panel">
+              <h3>Study next</h3>
+              <div id="overview-recommendations" class="recommendations-list compact-list"></div>
+            </div>
+          </div>
+          <div id="overview-summary" class="text-output"></div>
+        </section>
+
+        <section id="tab-transcript" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Transcript</h2>
+            <p>Search, copy, or download the captured lecture text.</p>
+          </div>
+          <div class="toolbar compact">
+            <input id="transcript-search" type="search" placeholder="Search transcript" autocomplete="off">
+            <button class="secondary-button" data-copy-target="detail-transcript" type="button">Copy</button>
+            <button class="secondary-button" data-download-target="detail-transcript" data-download-name="transcript.txt" type="button">Download TXT</button>
+          </div>
+          <div id="detail-transcript" class="transcript-output text-output"></div>
+        </section>
+
+        <section id="tab-summary" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Summary</h2>
+            <p>Start with the short version, then use the detailed notes for revision.</p>
+          </div>
+          <div class="section-actions">
+            <button class="primary-button" data-regenerate="detailed_summary" type="button">Regenerate</button>
+            <button class="secondary-button" data-copy-target="detail-summary" type="button">Copy</button>
+            <button class="secondary-button" data-download-target="detail-summary" data-download-name="summary.md" type="button">Download Markdown</button>
+          </div>
+          <div id="detail-summary" class="text-output"></div>
+        </section>
+
+        <section id="tab-key-points" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Key Points</h2>
+            <p>Review the core ideas and important terms.</p>
+          </div>
+          <div class="section-actions">
+            <button class="primary-button" data-regenerate="key_points" type="button">Regenerate</button>
+            <button class="secondary-button" data-copy-target="detail-key-points" type="button">Copy</button>
+            <button class="secondary-button" data-download-target="detail-key-points" data-download-name="key-points.md" type="button">Download Markdown</button>
+          </div>
+          <div id="detail-key-points" class="text-output"></div>
+          <h3>Important Terms</h3>
+          <div class="section-actions">
+            <button class="secondary-button" data-regenerate="terms" type="button">Regenerate terms</button>
+            <button class="secondary-button" data-copy-target="detail-terms" type="button">Copy terms</button>
+          </div>
+          <div id="detail-terms" class="text-output"></div>
+        </section>
+
+        <section id="tab-mind-map" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Mind Map</h2>
+            <p>See the lecture as a simple map of topics and supporting ideas.</p>
+          </div>
+          <div class="section-actions">
+            <button id="create-mind-map-button" class="primary-button" type="button">Create mind map</button>
+            <button id="download-mind-map-button" class="secondary-button" type="button">Download SVG</button>
+          </div>
+          <div id="mind-map-empty" class="empty-state">Create a mind map when you want a quick visual overview.</div>
+          <div id="mind-map-shell" class="mind-map-shell hidden">
+            <svg id="mind-map-svg" viewBox="0 0 960 520" role="img" aria-label="Lecture mind map"></svg>
+            <div id="mind-map-actions" class="section-actions"></div>
+          </div>
+        </section>
+
+        <section id="tab-ask" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Ask about this lecture</h2>
+            <p>Ask anything, and answers stay grounded in this lecture.</p>
+          </div>
+          <div id="chat-suggestions" class="prompt-row"></div>
+          <div id="chat-messages" class="chat-messages"></div>
+          <form id="chat-form" class="chat-form">
+            <input id="chat-input" type="text" placeholder="Ask a question about this lecture" autocomplete="off">
+            <button class="primary-button" type="submit">Ask</button>
+          </form>
+          <div class="section-actions">
+            <button id="clear-chat-button" class="secondary-button" type="button">Clear conversation</button>
+          </div>
+        </section>
+
+        <section id="tab-flashcards" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Flashcards</h2>
+            <p>Flip one card at a time, then mark what needs another look.</p>
+          </div>
+          <div class="section-actions">
+            <button id="create-flashcards-button" class="primary-button" type="button">Create flashcards</button>
+            <button id="regenerate-flashcards-button" class="secondary-button" type="button">Regenerate</button>
+          </div>
+          <div id="flashcard-empty" class="empty-state">Create flashcards from this lecture when you're ready.</div>
+          <div id="flashcard-study" class="flashcard-study hidden">
+            <div id="flashcard-progress" class="inline-message"></div>
+            <button id="flashcard-card" class="flashcard-card" type="button">
+              <span id="flashcard-side-label"></span>
+              <strong id="flashcard-content"></strong>
+            </button>
+            <div class="button-row">
+              <button id="prev-flashcard-button" class="secondary-button" type="button">Previous</button>
+              <button id="got-it-button" class="primary-button" type="button">Got it</button>
+              <button id="not-yet-button" class="secondary-button" type="button">Not yet</button>
+              <button id="next-flashcard-button" class="secondary-button" type="button">Next</button>
+              <button id="delete-flashcard-button" class="secondary-button danger" type="button">Delete</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-scripts" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Scripts</h2>
+            <p>Turn this lecture into ready-to-record study scripts.</p>
+          </div>
+          <div class="script-grid">
+            <section class="mini-panel">
+              <h3>Learning video script</h3>
+              <p class="inline-message">A chapter-style plan with narration and visuals.</p>
+              <div class="section-actions">
+                <button id="generate-video-script-button" class="primary-button" type="button">Create video script</button>
+                <button class="secondary-button" data-copy-target="video-script-output" type="button">Copy</button>
+                <button class="secondary-button" data-download-target="video-script-output" data-download-name="video-script.md" type="button">Download Markdown</button>
+              </div>
+              <div id="video-script-output" class="text-output"></div>
+            </section>
+            <section class="mini-panel">
+              <h3>Podcast script</h3>
+              <p class="inline-message">Warm spoken notes for review on the go.</p>
+              <div class="toolbar compact script-toolbar">
+                <select id="podcast-style-select" aria-label="Podcast style">
+                  <option value="two_voice">Two voices</option>
+                  <option value="single">Single narrator</option>
+                </select>
+                <button id="generate-podcast-script-button" class="primary-button" type="button">Create podcast</button>
+              </div>
+              <div class="section-actions">
+                <button class="secondary-button" data-copy-target="podcast-script-output" type="button">Copy</button>
+                <button class="secondary-button" data-download-target="podcast-script-output" data-download-name="podcast-script.md" type="button">Download Markdown</button>
+                <button class="secondary-button" data-download-target="podcast-script-output" data-download-name="podcast-script.txt" type="button">Download TXT</button>
+              </div>
+              <div id="podcast-script-output" class="text-output"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="tab-quiz" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Quiz</h2>
+            <p>Answer the questions, get a score, then see what to review next.</p>
+          </div>
+          <div class="section-actions">
+            <button class="primary-button" data-regenerate="quiz" type="button">Regenerate</button>
+            <button class="secondary-button" data-copy-target="detail-quiz" type="button">Copy</button>
+            <button class="secondary-button" data-download-target="detail-quiz" data-download-name="quiz.md" type="button">Download Markdown</button>
+            <button id="toggle-answers-button" class="secondary-button" type="button">Reveal answers</button>
+          </div>
+          <div id="quiz-practice-banner" class="inline-message"></div>
+          <form id="quiz-form" class="quiz-form"></form>
+          <div class="section-actions">
+            <button id="submit-quiz-button" class="primary-button" type="button">Submit quiz</button>
+            <button id="try-again-button" class="secondary-button" type="button">Try again</button>
+          </div>
+          <div id="quiz-result" class="quiz-result"></div>
+          <h3>Attempt history</h3>
+          <div id="quiz-attempts" class="attempt-list"></div>
+          <h3>Readable quiz</h3>
+          <div id="detail-quiz" class="text-output quiz-output"></div>
+        </section>
+
+        <section id="tab-export" class="tab-panel">
+          <div class="tab-heading">
+            <h2>Export</h2>
+            <p>Download clean notes for NotebookLM, submission, or quick transcript review.</p>
+          </div>
+          <div class="export-options">
+            <label><input type="checkbox" id="export-include-transcript" checked> Include transcript</label>
+            <label><input type="checkbox" id="export-include-quiz" checked> Include quiz</label>
+            <label><input type="checkbox" id="export-include-flashcards" checked> Include flashcards</label>
+            <label><input type="checkbox" id="export-include-mind-map" checked> Include mind map</label>
+          </div>
+          <div class="export-grid">
+            <button class="export-card" data-export-format="markdown" type="button">
+              <strong>Markdown notes</strong>
+              <span>Best for NotebookLM sources.</span>
+            </button>
+            <button class="export-card" data-export-format="pdf" type="button">
+              <strong>PDF notes</strong>
+              <span>Polished study notes with page numbers.</span>
+            </button>
+            <button class="export-card" data-export-format="txt" type="button">
+              <strong>Transcript TXT</strong>
+              <span>Plain lecture transcript only.</span>
+            </button>
+          </div>
+          <div id="output-paths" class="output-paths"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

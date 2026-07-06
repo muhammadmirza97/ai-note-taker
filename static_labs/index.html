@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lab Notes</title>
+    <link rel="stylesheet" href="/static-labs/lab.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Lab Notes</div>
+      <div class="topbar-actions">
+        <nav class="nav">
+          <button class="nav-link active" data-view="record">Lab</button>
+          <button class="nav-link" data-view="history">History</button>
+        </nav>
+        <button id="open-outputs-button" class="secondary-button" type="button">Outputs</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section id="record-view" class="view active">
+        <div class="record-layout">
+          <section class="capture-panel">
+            <div class="record-stage">
+              <button id="record-button" class="record-button" type="button" aria-label="Start Lab Recording">
+                <span id="record-icon"></span>
+              </button>
+              <div id="status-text" class="status-text">Ready</div>
+            </div>
+
+            <div class="marker-row">
+              <input id="marker-input" type="text" placeholder="Marker note" autocomplete="off" maxlength="120">
+              <button id="marker-button" class="secondary-button" type="button" disabled>Mark</button>
+            </div>
+
+            <div id="marker-list" class="marker-list"></div>
+          </section>
+
+          <section id="queue-panel" class="queue-panel hidden">
+            <div class="queue-header">
+              <h2>Processing Queue</h2>
+            </div>
+            <div id="queue-list" class="queue-list"></div>
+          </section>
+        </div>
+
+        <div id="record-results" class="results-grid hidden">
+          <section class="panel">
+            <h2>Lab Breakdown</h2>
+            <div id="breakdown-output" class="text-output"></div>
+          </section>
+          <section class="panel">
+            <h2>Transcript</h2>
+            <div id="transcript-output" class="text-output"></div>
+          </section>
+        </div>
+
+        <div class="action-row">
+          <button id="save-view-button" class="primary-button hidden" type="button">Open Saved Lab</button>
+        </div>
+      </section>
+
+      <section id="history-view" class="view">
+        <div class="history-tools">
+          <input id="search-input" type="search" placeholder="Search labs" autocomplete="off">
+        </div>
+        <div id="sessions-list" class="sessions-list"></div>
+      </section>
+
+      <section id="detail-view" class="view">
+        <div class="detail-header">
+          <div>
+            <button id="back-history-button" class="text-button" type="button">Back to History</button>
+            <h1 id="detail-title"></h1>
+            <p id="detail-date"></p>
+          </div>
+          <button id="export-button" class="primary-button" type="button">Export PDF</button>
+        </div>
+
+        <div class="results-grid">
+          <section class="panel">
+            <h2>Lab Breakdown</h2>
+            <div id="detail-breakdown" class="text-output"></div>
+          </section>
+          <section class="panel">
+            <h2>Transcript</h2>
+            <div id="detail-transcript" class="text-output"></div>
+          </section>
+        </div>
+
+        <section id="ocr-panel" class="panel ocr-panel hidden">
+          <h2>Screen Text</h2>
+          <div id="detail-ocr" class="text-output compact-output"></div>
+        </section>
+
+        <section id="frames-panel" class="panel frames-panel hidden">
+          <h2>Screen Frames</h2>
+          <div id="frames-grid" class="frames-grid"></div>
+        </section>
+
+        <section class="panel output-panel">
+          <h2>Saved Files</h2>
+          <div id="output-paths" class="output-paths"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static-labs/lab.js"></script>
+  </body>
+</html>

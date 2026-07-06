@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Personal/local app data
+data/*.db
+data/*.db-*
+data/*.bak
+data/uploads/
+outputs/
+
+# Logs
+*.log
+uvicorn*.log
+lab_uvicorn*.log
+
+# Build outputs
+build/
+dist/
+*.spec.bak
+
+# Recovery/decompiler scratch files
+recovered_*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

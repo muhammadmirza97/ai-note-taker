@@ -1,0 +1,48 @@
+{
+  "settings": {
+    "write_logs": true,
+    "start_on_windows_login": false,
+    "minimize_to_tray": false
+  },
+  "projects": [
+    {
+      "name": "Sample Python Server",
+      "folder": "C:\\path\\to\\sample-project",
+      "setup": [],
+      "run": "python server.py",
+      "wants_browser": true,
+      "port": 8100,
+      "url": "http://localhost:8100",
+      "readiness": { "type": "port", "port": 8100, "timeout_seconds": 20 },
+      "env": {},
+      "shell": "cmd",
+      "accent": "#276a61"
+    },
+    {
+      "name": "Vite Web App",
+      "folder": "C:\\Users\\you\\Projects\\my-vite-app",
+      "setup": ["npm install"],
+      "run": "npm run dev",
+      "wants_browser": true,
+      "port": 8101,
+      "url": "http://localhost:8101",
+      "readiness": { "type": "output", "text": "Local:", "timeout_seconds": 60 },
+      "env": { "BROWSER": "none" },
+      "shell": "cmd",
+      "accent": "#3b82f6"
+    },
+    {
+      "name": "FastAPI App",
+      "folder": "C:\\Users\\you\\Projects\\my-api",
+      "setup": ["venv\\Scripts\\python.exe -m pip install -r requirements.txt"],
+      "run": "venv\\Scripts\\python.exe -m uvicorn main:app --reload --host 127.0.0.1 --port {port}",
+      "wants_browser": true,
+      "port": 8102,
+      "url": "http://localhost:8102",
+      "readiness": { "type": "port", "port": 8102, "timeout_seconds": 60 },
+      "env": { "APP_ENV": "development" },
+      "shell": "cmd",
+      "accent": "#f59e0b"
+    }
+  ]
+}
